@@ -11,6 +11,7 @@
   ],
   "license": "MIT",
   "author": "",
+  "type": "module",
   "scripts": {
     "build": "next build",
     "dev": "next dev",

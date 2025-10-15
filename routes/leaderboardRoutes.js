@@ -3,8 +3,30 @@ import { query } from "../config/database.js"
 
 const router = express.Router()
 
-// Get top leaderboard entries
-router.get("/top/:limit?", async (req, res) => {
+// Get top leaderboard entries with default limit
+router.get("/top", async (req, res) => {
+  try {
+    const limit = 10
+
+    const leaderboard = await query(
+      `SELECT 
+        l.*,
+        RANK() OVER (ORDER BY l.overall_score DESC, l.completed_at ASC) as global_rank
+       FROM leaderboard l 
+       ORDER BY l.overall_score DESC, l.completed_at ASC 
+       LIMIT ?`,
+      [limit],
+    )
+
+    res.json({ leaderboard })
+  } catch (error) {
+    console.error("[v0] Error fetching leaderboard:", error)
+    res.status(500).json({ error: "Failed to fetch leaderboard" })
+  }
+})
+
+// Get top leaderboard entries with custom limit
+router.get("/top/:limit", async (req, res) => {
   try {
     const limit = Number.parseInt(req.params.limit) || 10
 
