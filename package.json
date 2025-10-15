@@ -1,0 +1,49 @@
+{
+  "name": "cybersafe-quest",
+  "version": "1.0.0",
+  "description": "CyberSafe Quest - Interactive Cybersecurity Education Game",
+  "keywords": [
+    "cybersecurity",
+    "education",
+    "game",
+    "nextjs",
+    "react"
+  ],
+  "license": "MIT",
+  "author": "",
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "lint": "next lint",
+    "server": "node server.js",
+    "server:dev": "nodemon server.js",
+    "start": "next start"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "html2canvas": "latest",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.454.0",
+    "mysql2": "latest",
+    "next": "15.2.4",
+    "react": "^19",
+    "react-dom": "^19",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss-animate": "^1.0.7",
+    "tw-animate-css": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "nodemon": "^3.0.2",
+    "postcss": "^8.5",
+    "tailwindcss": "^4.1.9",
+    "typescript": "^5"
+  }
+}
