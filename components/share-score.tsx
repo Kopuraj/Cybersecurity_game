@@ -13,13 +13,15 @@ import {
 } from "@/components/ui/dialog"
 
 interface ShareScoreProps {
-  username: string
+  username?: string | null
   score: number
   rank: number
 }
 
 export function ShareScore({ username, score, rank }: ShareScoreProps) {
   const [copied, setCopied] = useState(false)
+
+  const displayName = username || "A player"
 
   const shareText = `I just completed CyberSafe Quest with a security score of ${score}/100 and ranked #${rank} globally! 🛡️ Test your cybersecurity knowledge at Digital University.`
 

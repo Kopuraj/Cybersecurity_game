@@ -5,7 +5,7 @@ import { Shield, Award, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface CertificateGeneratorProps {
-  username: string
+  username?: string | null
   score: number
   rank: number
   completionDate: string
@@ -20,6 +20,8 @@ export function CertificateGenerator({
   achievements,
 }: CertificateGeneratorProps) {
   const certificateRef = useRef<HTMLDivElement>(null)
+
+  const displayName = username || "Cyber Guardian"
 
   const downloadCertificate = async () => {
     if (!certificateRef.current) return
@@ -38,7 +40,7 @@ export function CertificateGenerator({
           const url = URL.createObjectURL(blob)
           const link = document.createElement("a")
           link.href = url
-          link.download = `cybersafe-quest-certificate-${username}.png`
+          link.download = `cybersafe-quest-certificate-${displayName}.png`
           link.click()
           URL.revokeObjectURL(url)
         }
@@ -80,7 +82,7 @@ export function CertificateGenerator({
           {/* Body */}
           <div className="space-y-6 py-8">
             <p className="text-lg text-slate-300">This certifies that</p>
-            <h2 className="text-5xl font-bold text-white tracking-wide">{username}</h2>
+            <h2 className="text-5xl font-bold text-white tracking-wide">{displayName}</h2>
             <p className="text-lg text-slate-300">has successfully completed the</p>
             <h3 className="text-3xl font-bold text-cyan-400">CyberSafe Quest</h3>
             <p className="text-lg text-slate-300">Digital Security Training Program</p>
