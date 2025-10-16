@@ -56,6 +56,212 @@ export function calculatePasswordStrength(password: string): {
   return { score: Math.max(0, Math.min(100, score)), strength, feedback }
 }
 
+export function analyzePasswordSecurity(
+  password: string,
+  accountType: string,
+): {
+  score: number
+  strength: string
+  crackTime: string
+  crackTimeSeconds: number
+  riskLevel: string
+  hackerSuccessRate: number
+  potentialLoss: number
+  weaknessType: string
+  hackMessage: string
+  consequences: string[]
+  improvementTip: string
+} {
+  let score = 0
+  let crackTimeSeconds = 0
+  let weaknessType = ""
+  let hackMessage = ""
+
+  // Length-based crack time calculation
+  const length = password.length
+  if (length < 8) {
+    crackTimeSeconds = 0.001 // Instant
+    weaknessType = "too_short"
+    hackMessage = "Brute-force attack cracked password instantly"
+  } else if (length < 10) {
+    crackTimeSeconds = 60 // 1 minute
+    weaknessType = "short"
+    hackMessage = "Brute-force attack succeeded in under 1 minute"
+  } else if (length < 12) {
+    crackTimeSeconds = 3600 // 1 hour
+    weaknessType = "moderate_length"
+  } else if (length < 14) {
+    crackTimeSeconds = 86400 * 30 // 30 days
+  } else {
+    crackTimeSeconds = 86400 * 365 * 100 // 100 years
+  }
+
+  // Check for common passwords
+  const commonPasswords = [
+    "password",
+    "123456",
+    "qwerty",
+    "admin",
+    "letmein",
+    "welcome",
+    "monkey",
+    "dragon",
+    "master",
+    "sunshine",
+    "princess",
+    "football",
+  ]
+  if (commonPasswords.some((common) => password.toLowerCase().includes(common))) {
+    crackTimeSeconds = 0.001
+    weaknessType = "common_password"
+    hackMessage = "Rainbow table attack successful - password found in common password database"
+    score -= 30
+  }
+
+  // Check for personal information patterns
+  const personalPatterns = /\b(19|20)\d{2}\b|birthday|name|birth/i
+  if (personalPatterns.test(password)) {
+    crackTimeSeconds = Math.min(crackTimeSeconds, 60)
+    weaknessType = "personal_info"
+    hackMessage = "Social engineering attack successful - password contains personal information"
+    score -= 20
+  }
+
+  // Check for repeated patterns
+  if (/(.)\1{2,}/.test(password) || /^(.+)\1+$/.test(password)) {
+    crackTimeSeconds = Math.min(crackTimeSeconds, 300)
+    weaknessType = "repeated_pattern"
+    hackMessage = "Pattern recognition attack successful - password uses repeated characters"
+    score -= 15
+  }
+
+  // Character variety scoring
+  let charTypes = 0
+  if (/[a-z]/.test(password)) {
+    score += 15
+    charTypes++
+  }
+  if (/[A-Z]/.test(password)) {
+    score += 15
+    charTypes++
+  }
+  if (/[0-9]/.test(password)) {
+    score += 15
+    charTypes++
+  }
+  if (/[^a-zA-Z0-9]/.test(password)) {
+    score += 15
+    charTypes++
+  }
+
+  // Multiply crack time by character variety
+  crackTimeSeconds *= Math.pow(10, charTypes)
+
+  // Length bonus
+  if (length >= 8) score += 15
+  if (length >= 12) score += 15
+  if (length >= 16) score += 10
+
+  // Cap score
+  score = Math.max(0, Math.min(100, score))
+
+  // Format crack time
+  const crackTime = formatCrackTime(crackTimeSeconds)
+
+  // Determine risk level
+  let riskLevel = "LOW"
+  if (crackTimeSeconds < 60) riskLevel = "EXTREME"
+  else if (crackTimeSeconds < 3600) riskLevel = "HIGH"
+  else if (crackTimeSeconds < 86400) riskLevel = "MEDIUM"
+
+  // Calculate hacker success rate
+  const hackerSuccessRate = Math.max(5, Math.min(95, 100 - score))
+
+  // Calculate potential financial loss based on account type
+  const lossByType: Record<string, number> = {
+    social: 500,
+    banking: 50000,
+    email: 5000,
+    work: 100000,
+  }
+  const baseLoss = lossByType[accountType] || 1000
+  const potentialLoss = Math.round(baseLoss * (hackerSuccessRate / 100))
+
+  // Generate consequences based on account type
+  const consequences = generateConsequences(accountType, weaknessType)
+
+  // Generate improvement tip
+  const improvementTip = generateImprovementTip(password, weaknessType)
+
+  const strength = score >= 80 ? "STRONG" : score >= 60 ? "MEDIUM" : score >= 40 ? "WEAK" : "VERY WEAK"
+
+  return {
+    score,
+    strength,
+    crackTime,
+    crackTimeSeconds,
+    riskLevel,
+    hackerSuccessRate,
+    potentialLoss,
+    weaknessType,
+    hackMessage: hackMessage || "Dictionary attack in progress",
+    consequences,
+    improvementTip,
+  }
+}
+
+function formatCrackTime(seconds: number): string {
+  if (seconds < 1) return "Instant"
+  if (seconds < 60) return `${Math.round(seconds)} seconds`
+  if (seconds < 3600) return `${Math.round(seconds / 60)} minutes`
+  if (seconds < 86400) return `${Math.round(seconds / 3600)} hours`
+  if (seconds < 86400 * 30) return `${Math.round(seconds / 86400)} days`
+  if (seconds < 86400 * 365) return `${Math.round(seconds / (86400 * 30))} months`
+  return `${Math.round(seconds / (86400 * 365))} years`
+}
+
+function generateConsequences(accountType: string, weaknessType: string): string[] {
+  const consequencesByType: Record<string, string[]> = {
+    social: [
+      "Fake posts sent to all friends asking for money",
+      "Personal photos and messages leaked publicly",
+      "Identity stolen for scam operations",
+    ],
+    banking: [
+      "Unauthorized transfers draining your account",
+      "Credit cards maxed out with fraudulent purchases",
+      "Loans taken out in your name",
+    ],
+    email: [
+      "Password reset emails intercepted for all accounts",
+      "Confidential documents accessed and sold",
+      "Email used to scam your contacts",
+    ],
+    work: [
+      "Company data breach traced back to you",
+      "Confidential client information stolen",
+      "Termination and potential legal action",
+    ],
+  }
+
+  return (
+    consequencesByType[accountType] || ["Account compromised and data stolen", "Personal information sold on dark web"]
+  )
+}
+
+function generateImprovementTip(password: string, weaknessType: string): string {
+  const tips: Record<string, string> = {
+    too_short: "Add at least 6 more characters for 1,000,000x better security",
+    short: "Add 4 more characters to increase crack time from minutes to years",
+    common_password: "Avoid dictionary words - use a random combination instead",
+    personal_info: "Never use birth years, names, or personal info - try random words",
+    repeated_pattern: "Avoid repeated characters - mix it up for better security",
+    moderate_length: "Add special characters (!@#$%) to multiply security by 100x",
+  }
+
+  return tips[weaknessType] || "Use 14+ characters with uppercase, lowercase, numbers, and symbols"
+}
+
 export function calculateOverallScore(
   passwordScore: number,
   phishingScore: number,
