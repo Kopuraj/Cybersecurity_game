@@ -32,8 +32,14 @@ export default function Chapter1ResultsPage() {
               score: score,
             }),
           })
-          if (!response.ok) {
-            console.error("[v0] Failed to mark chapter as completed")
+
+          if (response.ok) {
+            console.log("[v0] Chapter marked as completed successfully")
+            const updatedGameState = JSON.parse(localStorage.getItem("gameState") || "{}")
+            updatedGameState.lastCompletedChapter = 1
+            localStorage.setItem("gameState", JSON.stringify(updatedGameState))
+          } else {
+            console.error("[v0] Failed to mark chapter as completed:", response.status)
           }
         }
       } catch (error) {

@@ -26,8 +26,19 @@ export default function JourneyPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadProgress()
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        loadProgress()
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange)
   }, [])
+
+  useEffect(() => {
+    loadProgress()
+  }, [gameState.sessionId])
 
   const loadProgress = async () => {
     if (!gameState.sessionId) {
@@ -81,19 +92,19 @@ export default function JourneyPage() {
         },
       ]
 
-      // Update status based on API data
-      if (data.progress) {
+      if (data.progress && Array.isArray(data.progress)) {
         data.progress.forEach((prog: any) => {
           const chapter = chapterData.find((c) => c.id === prog.chapter_id)
-          if (chapter && prog.chapter_number > 0) {
+          if (chapter) {
             chapter.status = prog.status
           }
         })
       }
 
       setChapters(chapterData)
+      console.log("[v0] Progress loaded:", chapterData)
     } catch (error) {
-      console.error("Failed to load progress:", error)
+      console.error("[v0] Failed to load progress:", error)
     } finally {
       setLoading(false)
     }
