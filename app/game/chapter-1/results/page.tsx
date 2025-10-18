@@ -19,6 +19,33 @@ export default function Chapter1ResultsPage() {
     setTimeout(() => setShowResults(true), 500)
   }, [])
 
+  useEffect(() => {
+    const markChapterComplete = async () => {
+      try {
+        const gameState = JSON.parse(localStorage.getItem("gameState") || "{}")
+        if (gameState.sessionId) {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/game/progress/${gameState.sessionId}/1`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              status: "completed",
+              score: score,
+            }),
+          })
+          if (!response.ok) {
+            console.error("[v0] Failed to mark chapter as completed")
+          }
+        }
+      } catch (error) {
+        console.error("[v0] Error marking chapter complete:", error)
+      }
+    }
+
+    if (score > 0) {
+      markChapterComplete()
+    }
+  }, [score])
+
   const getPerformance = () => {
     if (score >= 80)
       return {
