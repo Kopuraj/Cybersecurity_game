@@ -46,7 +46,7 @@ export default function HomePage() {
           <Button
             size="lg"
             className="terminal-border h-16 text-xl font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all hover:scale-105"
-            onClick={() => router.push("/character-creation")}
+            onClick={() => router.push("/user-selection")}
           >
             START YOUR DIGITAL JOURNEY
             <ArrowRight className="ml-2 h-6 w-6" />

@@ -154,8 +154,8 @@ export default function CharacterCreation() {
 
         {/* Back Link */}
         <div className="text-center mt-6">
-          <Button variant="link" onClick={() => router.push("/")} className="text-muted-foreground">
-            ← Back to Home
+          <Button variant="link" onClick={() => router.push("/user-selection")} className="text-muted-foreground">
+            ← Back to Selection
           </Button>
         </div>
       </div>
